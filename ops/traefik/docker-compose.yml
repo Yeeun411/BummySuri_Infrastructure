@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:v2.10
+    network_mode: host
+    command:
+      - --configFile=/traefik.yml
+      - --log.level=DEBUG
+      - --entrypoints.web.address=:8081
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/traefik.yml
+      - ./dynamic.yml:/dynamic.yml
+      - ${CERT_FILE_PATH}:/fullchain.pem
+      - ${KEY_FILE_PATH}:/privkey.pem
+      - ./acme.json:/acme.json
+

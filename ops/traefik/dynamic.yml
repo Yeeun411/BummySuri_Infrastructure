@@ -1,0 +1,107 @@
+http:
+  services:
+    traefik:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8080"
+        passHostHeader: true
+    portainer:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:9000"
+        passHostHeader: true
+    netdata:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:19999"
+        passHostHeader: true    
+    dummy-service:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1"
+    2023-frontend-release:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:3000"
+        passHostHeader: true
+    2023-backend-release:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8000"
+        passHostHeader: true
+    2023-frontend-develop:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:3001"
+        passHostHeader: true
+    2023-backend-develop:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8001"
+        passHostHeader: true
+
+  middlewares:
+    redirectmain:
+      redirectRegex:
+        regex: "^https://asdf.bummysuri.com(.*)"
+        replacement: "https://www.bummysuri.com$${1}"
+        permanent: true
+
+  routers:
+    traefik:
+      rule: "Host(`traefik.bummysuri.com`)"
+      service: traefik
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    portainer:
+      rule: "Host(`portainer.bummysuri.com`)"
+      service: portainer
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    netdata:
+      rule: "Host(`netdata.bummysuri.com`)"
+      service: netdata
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    2023-frontend-release-redirect:
+      rule: "Host(`bummysuri.com`)"
+      entryPoints:
+        - websecure
+      middlewares: redirectmain
+      service: dummy-service
+      tls:
+        certResolver: letsencrypt
+    2023-frontend-release:
+      rule: "Host(`www.bummysuri.com`)"
+      service: 2023-frontend-release
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    2023-backend-release:
+      rule: "Host(`api.bummysuri.com`)"
+      service: 2023-backend-release
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    2023-frontend-develop:
+      rule: "Host(`www.dev.bummysuri.com`)"
+      service: 2023-frontend-develop
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    2023-backend-develop:
+      rule: "Host(`api.dev.bummysuri.com`)"
+      service: 2023-backend-develop
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
